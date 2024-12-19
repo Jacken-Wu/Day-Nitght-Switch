@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day/Night Switch</title>
+    <style>
+        :root {
+            --circle-radius: 30px;
+            --circle-diameter: calc(var(--circle-radius) * 2);
+            --gap: calc(var(--circle-radius) / 3.75);
+            --swicth-time: 0.5s;
+            --inner-shadow-x: 4px;
+            --inner-shadow-y: calc(var(--inner-shadow-x) * 2);
+            --inner-shadow-fuzz: var(--inner-shadow-y);
+            --inner-shadow-expand: calc(- var(--inner-shadow-x));
+            --transition-curve: cubic-bezier(0.3, 0, 0.6, 1.3);
+            --stars-z-index: 0;
+            --sun-z-index: 1;
+            --clouds-z-index: 2;
+        }
+
+        body {
+            height: 90vh;
+        }
+
+        #switch {
+            position: relative;
+            width: calc((var(--circle-radius) * 2 + var(--gap) * 2) * 150 / 70);
+            height: calc(var(--circle-radius) * 2 + var(--gap) * 2);
+            margin: auto;
+            top: 50%;
+            background-color: rgb(83, 169, 255);
+            border-radius: calc(var(--circle-radius) + var(--gap));
+            box-shadow: inset 0 0 5px 4px rgba(50, 50, 50, 0.5);
+            transition: background-color var(--swicth-time) cubic-bezier(0.3, 0, 0.7, 1);
+            overflow: hidden;
+        }
+
+        #checkbox:checked+#switch {
+            background-color: rgb(63, 69, 82);
+        }
+
+        #sun {
+            display: block;
+            position: absolute;
+            top: var(--gap);
+            left: var(--gap);
+            width: var(--circle-diameter);
+            height: var(--circle-diameter);
+            background-color: rgb(255, 185, 80);
+            border-radius: var(--circle-radius);
+            transition: left var(--swicth-time) var(--transition-curve);
+            overflow: hidden;
+            z-index: var(--sun-z-index);
+        }
+
+        #shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: inset 4px 8px 8px -4px rgba(255, 253, 240, 0.497), inset -5px -3px 8px -4px rgba(98, 98, 98, 0.645), 2px 6px 10px 0 rgba(50, 50, 50, 0.5);
+        }
+
+        #checkbox {
+            display: none;
+        }
+
+        #checkbox:checked+#switch #sun {
+            left: calc(100% - var(--circle-diameter) - var(--gap));
+        }
+
+        #moon {
+            width: var(--circle-diameter);
+            height: var(--circle-diameter);
+            background-color: rgb(179, 225, 233);
+            position: relative;
+            top: 0;
+            left: var(--circle-diameter);
+            border-radius: var(--circle-radius);
+            transition: left var(--swicth-time) cubic-bezier(0.6, 0, 0.6, 1), opacity calc(var(--swicth-time) * 0.8) cubic-bezier(1, 0, 1, 1);
+            box-shadow: 0 0 7px 8px rgba(129, 175, 250, 0.5);
+            opacity: 0;
+        }
+
+        #checkbox:checked+#switch #moon {
+            position: relative;
+            transition: left var(--swicth-time) cubic-bezier(0.25, 0, 0.2, 1), opacity var(--swicth-time) cubic-bezier(0.25, 0, 0.2, 1);
+            left: 0;
+            opacity: 1;
+        }
+
+        .moon-hole {
+            position: absolute;
+            background-color: rgb(165, 213, 229);
+            box-shadow: inset 0 0 3px 1px rgba(50, 50, 50, 0.5);
+        }
+
+        #moon-hole-1 {
+            width: 20%;
+            height: 20%;
+            top: 20%;
+            left: 55%;
+            border-radius: 50%;
+        }
+
+        #moon-hole-2 {
+            width: 25%;
+            height: 25%;
+            top: 40%;
+            left: 20%;
+            border-radius: 50%;
+        }
+
+        #moon-hole-3 {
+            width: 30%;
+            height: 30%;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+        }
+
+        #light-rays {
+            position: absolute;
+            left: 0;
+            transition: left var(--swicth-time) var(--transition-curve);
+        }
+
+        #checkbox:checked+#switch #light-rays {
+            left: calc(100% - var(--circle-diameter) - var(--gap) * 2);
+        }
+
+        .light-ray {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 254, 234, 0.12);
+        }
+
+        #light-ray-1 {
+            width: calc(var(--circle-diameter) * 1.5);
+            height: calc(var(--circle-diameter) * 1.5);
+            top: calc(var(--circle-diameter) * -0.25 + var(--gap));
+            left: calc(var(--circle-diameter) * -0.25 + var(--gap));
+        }
+
+        #light-ray-2 {
+            width: calc(var(--circle-diameter) * 2.2);
+            height: calc(var(--circle-diameter) * 2.2);
+            top: calc(var(--circle-diameter) * -0.6 + var(--gap));
+            left: calc(var(--circle-diameter) * -0.6 + var(--gap));
+        }
+
+        #light-ray-3 {
+            width: calc(var(--circle-diameter) * 3);
+            height: calc(var(--circle-diameter) * 3);
+            top: calc(var(--circle-diameter) * -1 + var(--gap));
+            left: calc(var(--circle-diameter) * -1 + var(--gap));
+        }
+
+        #clouds {
+            position: absolute;
+        }
+
+        .cloud {
+            position: absolute;
+            width: var(--circle-radius);
+            height: var(--circle-radius);
+
+            div {
+                position: absolute;
+            }
+        }
+
+        .cloud-front {
+            background-color: rgb(244, 255, 255);
+            border-radius: 50%;
+        }
+
+        .cloud-backward {
+            background-color: rgb(116, 134, 157);
+            border-radius: 50%;
+        }
+
+        .cloud-part-1 {
+            width: 300%;
+            height: 300%;
+            top: 200%;
+            left: 0;
+        }
+
+        .cloud-part-2 {
+            width: 160%;
+            height: 160%;
+            top: 180%;
+            left: 170%;
+        }
+
+        .cloud-part-3 {
+            width: 100%;
+            height: 100%;
+            top: 200%;
+            left: 300%;
+        }
+
+        .cloud-part-4 {
+            width: 240%;
+            height: 240%;
+            top: 130%;
+            left: 360%;
+        }
+
+        .cloud-part-5 {
+            width: 130%;
+            height: 130%;
+            top: 90%;
+            left: 500%;
+        }
+
+        #cloud-1 {
+            top: 0;
+            left: 0;
+            transition: top var(--swicth-time) var(--transition-curve);
+        }
+
+        #cloud-2 {
+            top: calc(var(--circle-radius) * 0.25);
+            left: 0;
+            transition: top var(--swicth-time) var(--transition-curve);
+            z-index: var(--clouds-z-index);
+        }
+
+        #checkbox:checked+#switch #clouds {
+            #cloud-1 {
+                top: calc(var(--circle-radius) * 1.5);
+            }
+
+            #cloud-2 {
+                top: calc(var(--circle-radius) * 1.5);
+            }
+        }
+
+        #stars {
+            position: absolute;
+            top: calc(var(--circle-radius) * -2.3);
+            left: 0;
+            width: var(--circle-radius);
+            height: var(--circle-radius);
+            transition: top var(--swicth-time) var(--transition-curve);
+            z-index: var(--stars-z-index);
+        }
+
+        #checkbox:checked+#switch #stars {
+            top: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: rgb(255, 236, 125);
+            clip-path: path('M 50,0 A 50,50 90,0,0 100,50 50,50 90,0,0 50,100 50,50 90,0,0 0,50 50,50 90,0,0 50,0 Z');
+        }
+
+        #star-1 {
+            transform: scale(0.08, 0.2);
+            top: -100%;
+            left: 40%;
+        }
+
+        #star-2 {
+            transform: scale(0.1, 0.2);
+            top: -60%;
+            left: -70%;
+        }
+
+        #star-3 {
+            transform: scale(0.15, 0.3);
+            top: -20%;
+            left: -25%;
+        }
+
+        #star-4 {
+            transform: scale(0.07, 0.14);
+            top: -70%;
+            left: 120%;
+        }
+
+        #star-5 {
+            transform: scale(0.1, 0.2);
+            top: 20%;
+            left: 90%;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="checkbox" id="checkbox">
+    <div id="switch">
+        <div id="light-rays">
+            <div id="light-ray-1" class="light-ray"></div>
+            <div id="light-ray-2" class="light-ray"></div>
+            <div id="light-ray-3" class="light-ray"></div>
+        </div>
+        <label for="checkbox" id="sun">
+            <div id="moon">
+                <div id="moon-hole-1" class="moon-hole"></div>
+                <div id="moon-hole-2" class="moon-hole"></div>
+                <div id="moon-hole-3" class="moon-hole"></div>
+            </div>
+            <div id="shadow"></div>
+        </label>
+        <div id="clouds">
+            <div id="cloud-1" class="cloud">
+                <div class="cloud-part-1 cloud-backward"></div>
+                <div class="cloud-part-2 cloud-backward"></div>
+                <div class="cloud-part-3 cloud-backward"></div>
+                <div class="cloud-part-4 cloud-backward"></div>
+                <div class="cloud-part-5 cloud-backward"></div>
+            </div>
+            <div id="cloud-2" class="cloud">
+                <div class="cloud-part-1 cloud-front"></div>
+                <div class="cloud-part-2 cloud-front"></div>
+                <div class="cloud-part-3 cloud-front"></div>
+                <div class="cloud-part-4 cloud-front"></div>
+                <div class="cloud-part-5 cloud-front"></div>
+            </div>
+        </div>
+        <div id="stars">
+            <div id="star-1" class="star"></div>
+            <div id="star-2" class="star"></div>
+            <div id="star-3" class="star"></div>
+            <div id="star-4" class="star"></div>
+            <div id="star-5" class="star"></div>
+        </div>
+    </div>
+</body>
+
+</html>
