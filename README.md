@@ -2,6 +2,8 @@
 
 ![Day-Night-Switch](./day_night_switch.gif)
 
+[点我在线预览](https://jacken-wu.github.io/code/day-night-switch/index.html)
+
 ## 我为什么要写这个开关？
 
 1. 因为没有找到这个切换开关的原生 CSS 实现，所以自己写一个；
